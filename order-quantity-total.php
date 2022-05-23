@@ -28,13 +28,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Exit if WooCommerce is not active.
  */
-if (
-	! in_array(
-		'woocommerce/woocommerce.php',
-		apply_filters( 'active_plugins', get_option( 'active_plugins' ) ),
-		true
-	)
-) {
+if ( ! in_array(
+	'woocommerce/woocommerce.php',
+	apply_filters( 'active_plugins', get_option( 'active_plugins' ) ),
+	true
+) ) {
 	exit;
 }
 
@@ -63,3 +61,37 @@ function oqt_admin_order_items_after_line_items( $order_id ) {
 	<?php
 }
 add_action( 'woocommerce_admin_order_items_after_line_items', 'oqt_admin_order_items_after_line_items' );
+
+/**
+ * Add order total item count to new order admin email.
+ *
+ * @param array    $total_rows Data for totals.
+ * @param WC_Order $order Order object.
+ * @param string   $tax_display Tax string.
+ */
+function oqt_get_order_item_totals( $total_rows, $order, $tax_display ) {
+	$oqt_row    = array(
+		'oqt' => array(
+			'label' => __( 'Order Quantity Total:', 'order-quantity-total' ),
+			'value' => strval( $order->get_item_count() ),
+		),
+	);
+	$total_rows = array_merge( $oqt_row, $total_rows );
+
+	return $total_rows;
+}
+
+/**
+ * Include order total item count in admin email only.
+ *
+ * @param WC_Order $order Order object.
+ * @param boolean  $sent_to_admin Whether the email is for admin.
+ * @param string   $plain_text Email plain text.
+ * @param string   $email Email HTML.
+ */
+function oqt_email_before_order_table( $order, $sent_to_admin, $plain_text, $email ) {
+	if ( $sent_to_admin ) {
+		add_filter( 'woocommerce_get_order_item_totals', 'oqt_get_order_item_totals', 99, 3 );
+	}
+}
+add_action( 'woocommerce_email_before_order_table', 'oqt_email_before_order_table', 10, 4 );
