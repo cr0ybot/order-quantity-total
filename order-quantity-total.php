@@ -12,7 +12,7 @@
  * Plugin URI: https://github.com/cr0ybot/order-quantity-total
  * Description: Display the total quantity on the order page.
  * Version: 0.1.0
- * Requires PHP: 7.0
+ * Requires PHP: 5.0
  * Author: Cory Hughart
  * Author URI: https://coryhughart.com
  * License: GPLv3
